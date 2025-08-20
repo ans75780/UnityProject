@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4dadc2af5014874c832c9c1f6da8d0a, type: 3}
+  m_Name: SO_Slime
+  m_EditorClassIdentifier: 
+  name: Slime
+  maxHp: 10
+  atk: 3
+  attackRange: 1
+  moveSpeed: 1
