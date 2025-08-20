@@ -6,10 +6,7 @@ using NUnit.Framework.Constraints;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-
-
-
-
+using PlayerCombat = Character.Player.PlayerCombat;
 
 
 public class Player : MonoBehaviour
@@ -22,13 +19,19 @@ public class Player : MonoBehaviour
     
     private PlayerMotor playerMotor;
     
-    public PlayerStateMachine fsm;
+    private PlayerCombat playerCombat;
     
-    public float InitMaxHealth;
+    private PlayerStateMachine fsm;
 
+    
+    
+    public PlayerStateMachine FSM
+    {
+        get { return fsm; }
+    }
+    public GameObject weapon;
+    
     Animator animator;
-
-    private Weapon weapon;
     
     private int playerLevel;
 
@@ -39,23 +42,12 @@ public class Player : MonoBehaviour
     [SerializeField]
     private string currentStateName;
     
-    void OnEnable()
-    {
-        damageable = GetComponent<Damageable>();
-
-        isDead = false;
-        
-        if (damageable != null)
-        {
-            damageable.MaxHealth = InitMaxHealth;
-        }
-        
-    }
-
     void Awake()
     {
         animator = GetComponent<Animator>();
         playerMotor =  GetComponent<PlayerMotor>();
+        playerCombat = GetComponent<PlayerCombat>();
+        
         
         PlayerContext context =  new PlayerContext();
         context.animator = animator;
@@ -67,34 +59,41 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         damageable =  GetComponent<Damageable>();
         
-        damageable.OnApplyDamage += ReceiveOnApplyDamage;
-        damageable.OnDeath += ReceiveOnDeath;
-        
-        
         fsm = new PlayerStateMachine(context, new IdleState());
         fsm.CreateState(typeof(MoveState), new MoveState());
         fsm.CreateState(typeof(AttackState), new AttackState());
         fsm.CreateState(typeof(HitState), new HitState());
         fsm.CreateState(typeof(DeadState), new DeadState());
         
-        
-        fsm.OnChangeState += ReceiveOnChangeState;
-
         currentStateName = fsm.GetCurrentStateName();
+    }
+    
+    void OnEnable()
+    {
+        isDead = false;
+
+        damageable.OnApplyDamage += ReceiveOnApplyDamage;
+        damageable.OnDeath += ReceiveOnDeath;
+        fsm.OnChangeState += ReceiveOnChangeState;
+    }
+    
+    void OnDisable()
+    {
+        isDead = true;
+        damageable.OnApplyDamage -= ReceiveOnApplyDamage;
+        damageable.OnDeath -= ReceiveOnDeath;
+        fsm.OnChangeState -= ReceiveOnChangeState;
     }
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         playerLevel = 1;
-        
-        weapon = GetComponentInChildren<Weapon>();
-        
+
         if (weapon)
         {
-            weapon.SetOwner(this.gameObject);
-            
-            weapon.OnWeaponDamageCalc += OnWeaponDamageCalc;
+            GameObject weaponObject = Instantiate(weapon);
+            playerCombat.Equip(weaponObject);
         }
     }
     
@@ -117,46 +116,11 @@ public class Player : MonoBehaviour
             fsm.LateUpdate(Time.deltaTime);
     }
     
-    void OnAttack()
-    {
-       
-    }
-
-    void OnRoll()
-    {
-        animator.SetTrigger(isRollHash); 
-    }
-    
-    float OnWeaponDamageCalc(float weaponDamage)
-    {
-        return weaponDamage * playerLevel;
-    }
-
     void ReceiveOnChangeState(IPlayerState newState)
     {
         currentStateName = fsm.GetCurrentStateName();
     }
-
-    void Notify_AttackStart()
-    {
-        weapon.OnAttackStart();
-    }
-
-    void Notify_AttackEnd()
-    {
-        weapon.OnAttackEnd();
-    }
     
-    void Notify_EnableNextAttack()
-    {
-     //   playerController.EnableNextAttack = true;
-    }
-
-    void Notify_DisableNextAttack()
-    {
-       // playerController.EnableNextAttack = false;
-    }
-
     void ReceiveOnApplyDamage(DamageInfo damageInfo)
     {
         if (isDead)
@@ -177,18 +141,6 @@ public class Player : MonoBehaviour
     void ReceiveOnDeath(DamageInfo damageInfo)
     {
         isDead = true;
-        
         fsm.ChangeState(typeof(DeadState));
-    }
-
-
-    public void SubcribeEvent()
-    {
-        
-    }
-
-    public void UnSubcribeEvent()
-    {
-        
     }
 }

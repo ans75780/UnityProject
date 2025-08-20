@@ -19,9 +19,12 @@ namespace Character.Player
     {
         private PlayerInput playerInput;
         
+        private PlayerCombat playerCombat;
+        
         private InputAction moveAction;
        
         private InputAction attackAction;
+        
         
         
         public delegate void InputContextHandler(InputAction.CallbackContext context);
@@ -32,9 +35,13 @@ namespace Character.Player
         private Vector2 inputAxis;
         public Vector2 InputAxis { get { return inputAxis; } }
         
+        
         void Awake()
         {
             playerInput = GetComponent<PlayerInput>();
+         
+            playerCombat = GetComponent<PlayerCombat>();
+            
         }
         
         void Start()
@@ -56,7 +63,7 @@ namespace Character.Player
             moveAction.canceled += ReceiveOnMove;
             
             attackAction = playerInput.actions.FindAction("Attack");
-            attackAction.started += ReceiveInput;
+            attackAction.started += ReceiveOnAttack;
             
         }
 
@@ -66,12 +73,20 @@ namespace Character.Player
             moveAction.performed -= ReceiveOnMove;
             moveAction.canceled -= ReceiveOnMove;
             
-            attackAction.started -= ReceiveInput;
+            attackAction.started -= ReceiveOnAttack;
         }
 
         void ReceiveOnMove(InputAction.CallbackContext context)
         {
             inputAxis = context.ReadValue<Vector2>();
+        }
+        
+        void ReceiveOnAttack(InputAction.CallbackContext context)
+        {
+            if (playerCombat.IsWeaponEquipped)
+            {
+                OnInputContext?.Invoke(context);
+            }
         }
         
         void ReceiveInput(InputAction.CallbackContext context)

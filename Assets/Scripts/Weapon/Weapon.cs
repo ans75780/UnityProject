@@ -17,7 +17,6 @@ public class Weapon : MonoBehaviour
     {
         owner = _owner;
         
-        
         int ownerMask = 1 << owner.layer;
         int weaponMask = 1 << LayerMask.NameToLayer("Weapon");
         
@@ -25,6 +24,12 @@ public class Weapon : MonoBehaviour
         capsuleCollider.excludeLayers = ownerMask | weaponMask;
     }
 
+    public void ClearOwner()
+    {
+        owner = null;
+        capsuleCollider.excludeLayers = 0;
+    }
+    
     void Awake()
     {
         capsuleCollider = GetComponent<CapsuleCollider>();
@@ -32,18 +37,6 @@ public class Weapon : MonoBehaviour
         
     }
     
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-     
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void OnAttackStart()
     {
         capsuleCollider.enabled = true;

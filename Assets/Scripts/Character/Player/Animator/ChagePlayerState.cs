@@ -53,7 +53,7 @@ public class ChagePlayerState : StateMachineBehaviour
                 type = typeof(AttackState);
                 break;
         }
-        animator.GetComponent<Player>().fsm.ChangeState(type);
+        animator.GetComponent<Player>().FSM.ChangeState(type);
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()

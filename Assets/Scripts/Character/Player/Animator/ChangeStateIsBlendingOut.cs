@@ -49,7 +49,7 @@ public class ChangeStateIsBlendingOut : StateMachineBehaviour
                     type = typeof(AttackState);
                     break;
             }
-            animator.GetComponent<Player>().fsm.ChangeState(type);
+            animator.GetComponent<Player>().FSM.ChangeState(type);
             isOnce = false;
         }
     }
