@@ -24,14 +24,18 @@ namespace Character.Player
         private InputAction moveAction;
        
         private InputAction attackAction;
-        
+
+        private InputAction dodgeAction;
         
         
         public delegate void InputContextHandler(InputAction.CallbackContext context);
         
         public event InputContextHandler OnInputContext;
 
-
+        //AnyState
+        public event InputContextHandler OnDodge;
+        
+        [SerializeField]
         private Vector2 inputAxis;
         public Vector2 InputAxis { get { return inputAxis; } }
         
@@ -65,6 +69,9 @@ namespace Character.Player
             attackAction = playerInput.actions.FindAction("Attack");
             attackAction.started += ReceiveOnAttack;
             
+            dodgeAction = playerInput.actions.FindAction("Dodge");
+            dodgeAction.started += ReceiveOnDodge;
+            
         }
 
         void OnDisable()
@@ -74,6 +81,9 @@ namespace Character.Player
             moveAction.canceled -= ReceiveOnMove;
             
             attackAction.started -= ReceiveOnAttack;
+            
+            dodgeAction.started -= ReceiveOnDodge;
+            
         }
 
         void ReceiveOnMove(InputAction.CallbackContext context)
@@ -85,8 +95,15 @@ namespace Character.Player
         {
             if (playerCombat.IsWeaponEquipped)
             {
-                OnInputContext?.Invoke(context);
+                OnInputContext.Invoke(context);
             }
+        }
+
+        void ReceiveOnDodge(InputAction.CallbackContext context)
+        {
+            Debug.Log("DodgeTest");
+            
+            OnDodge.Invoke(context);
         }
         
         void ReceiveInput(InputAction.CallbackContext context)

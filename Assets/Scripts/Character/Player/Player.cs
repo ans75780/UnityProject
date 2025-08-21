@@ -54,8 +54,9 @@ public class Player : MonoBehaviour
         context.rigidbody = GetComponent<Rigidbody>();
         context.player = this;
         context.adapter = GetComponent<PlayerInputAdapter>();
-        context.playerMotor = playerMotor;
-
+        context.motor = playerMotor;
+        context.combat = playerCombat;
+        
         rb = GetComponent<Rigidbody>();
         damageable =  GetComponent<Damageable>();
         
@@ -64,6 +65,8 @@ public class Player : MonoBehaviour
         fsm.CreateState(typeof(AttackState), new AttackState());
         fsm.CreateState(typeof(HitState), new HitState());
         fsm.CreateState(typeof(DeadState), new DeadState());
+        fsm.CreateState(typeof(DodgeState), new DodgeState());
+        
         
         currentStateName = fsm.GetCurrentStateName();
     }

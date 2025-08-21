@@ -46,12 +46,12 @@ namespace Character.Player.StateMachine
         {
             if (inputContext.action.name.Equals("Attack"))
             {
-                //if (context.playerController.EnableNextAttack)
-                //{
-                //    context.animator.SetTrigger(isAttackHash);
-                //    context.animator.SetInteger(comboCountHash, ++comboCount);
-                //    context.playerController.EnableNextAttack = false;
-                //}
+                if (context.combat.EnableNextAttack)
+                {
+                    context.animator.SetTrigger(isAttackHash);
+                    context.animator.SetInteger(comboCountHash, ++comboCount);
+                    context.combat.EnableNextAttack = false;
+                }
             }
         }
     }

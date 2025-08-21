@@ -11,10 +11,11 @@ using UnityEngine.UI;
 public struct PlayerContext
 {
     public Animator animator;
-    public PlayerStateMachine fsm;
-    public PlayerMotor playerMotor;
-    public PlayerInputAdapter adapter;
     public Player player;
+    public PlayerStateMachine fsm;
+    public PlayerMotor motor;
+    public PlayerInputAdapter adapter;
+    public PlayerCombat combat;
     public Rigidbody rigidbody;
     public float StateTime;
 }
@@ -79,14 +80,18 @@ public class PlayerStateMachine
 
         PlayerInputAdapter adapter = context.player.GetComponent<PlayerInputAdapter>();
         
-        adapter.OnInputContext += InputedContext;
+        adapter.OnInputContext += Receive_InputedContext;
+
+        adapter.OnDodge += Receive_OnDodge;
+
     }
 
     ~PlayerStateMachine()
     {
         PlayerInputAdapter adapter = context.player.GetComponent<PlayerInputAdapter>();
         
-        adapter.OnInputContext -= InputedContext;
+        adapter.OnInputContext -= Receive_InputedContext;
+        adapter.OnDodge -= Receive_OnDodge;
     }
     
     public void CreateState(Type type, IPlayerState state)
@@ -133,11 +138,18 @@ public class PlayerStateMachine
         currentState.LateUpdate(context, deltaTime);
     }
 
-    public void InputedContext(InputAction.CallbackContext inputContext)
+    public void Receive_InputedContext(InputAction.CallbackContext inputContext)
     {
         currentState.InputedContext(context, inputContext);
     }
 
+    public void Receive_OnDodge(InputAction.CallbackContext context)
+    {
+        //stamina check구문 필요
+        
+        ChangeState(typeof(DodgeState));
+    }
+    
     public void Notify_ChangeState(Type stateType)
     {
         ChangeState(stateType);

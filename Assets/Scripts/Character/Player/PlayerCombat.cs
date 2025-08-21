@@ -10,13 +10,17 @@ namespace Character.Player
         private Transform weaponSocket;
         public string socketName;
         
-        
+        [SerializeField]
         private bool enableNextAttack = false;
         
         public bool EnableNextAttack {
             get
             {
                 return enableNextAttack;
+            }
+            set
+            {
+                enableNextAttack = value;
             }
         }
         

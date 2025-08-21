@@ -71,6 +71,11 @@ public class PlayerMotor : MonoBehaviour
         
         rigidbody.MovePosition(transform.position + velocity);
     }
+
+    public void Turn(Quaternion rotation)
+    {
+        transform.rotation = rotation;
+    }
     
     private void OnDrawGizmos()
     {

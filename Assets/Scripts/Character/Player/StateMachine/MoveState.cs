@@ -22,7 +22,7 @@ namespace Character.Player.StateMachine
 
         public override void FixedUpdate(PlayerContext context, float fixedDeltaTime)
         {
-            GameObject playerCamera = context.playerMotor.playerCamera;
+            GameObject playerCamera = context.motor.playerCamera;
             
             Vector3 forwardVector = playerCamera.transform.forward;
 
@@ -37,7 +37,7 @@ namespace Character.Player.StateMachine
         
             if (direction.magnitude > 0.1)
             {   
-                context.playerMotor.Move(direction.normalized);
+                context.motor.Move(direction.normalized);
             }
         }
 
