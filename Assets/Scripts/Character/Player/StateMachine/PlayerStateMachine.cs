@@ -28,6 +28,12 @@ public abstract class IPlayerState
     public abstract void LateUpdate(PlayerContext context, float fixedDeltaTime);
     public abstract void Exit(PlayerContext context);
     
+    //해당 상태로 전환될 수 있는지 여부를 체크하는 함수.
+    public virtual bool CheckCondition(PlayerContext context)
+    {
+        return true;
+    }
+    
     //특정 조건인지를 검사
     public virtual bool CanAttack(PlayerContext context)
     {
@@ -114,7 +120,8 @@ public class PlayerStateMachine
     public void ChangeState(IPlayerState changeState)
     {
         if (changeState == currentState) return;
-
+        if (changeState.CheckCondition(context) == false) return;
+        
         currentState.Exit(context);
 
         currentState = changeState;

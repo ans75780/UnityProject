@@ -1,4 +1,6 @@
 using System;
+using Character.Player;
+using NUnit.Framework.Constraints;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -10,6 +12,8 @@ public class PlayerMotor : MonoBehaviour
     public GameObject playerCamera;
     
     private Rigidbody rigidbody;
+    private PlayerInputAdapter adapter;
+    
     
     public float walkSpeed = 5;
     public float rotateSpeed = 15;
@@ -22,33 +26,51 @@ public class PlayerMotor : MonoBehaviour
     
     [SerializeField]    
     private bool isGrounded;
-
-    [SerializeField]
-    private bool enableNextAttack;
     
+    public bool IsGrounded
+    {
+        get { return isGrounded; }
+    }
+    
+    [SerializeField] 
+    private bool isFalling;
+
+    public bool IsFalling
+    {
+        get { return isFalling; }
+    }
     
     private float velocity;
     
-    public bool EnableNextAttack {
-        get { return enableNextAttack; }
-        set
-        {
-            enableNextAttack = value;
-        }
-    }
-
+    private int isFallingHash = Animator.StringToHash("IsFalling");
+    private int isGroundedHash = Animator.StringToHash("IsGrounded");
+    private int movementHash = Animator.StringToHash("Movement");
+    private Animator animator;
+    
     void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
-        
+        animator = GetComponent<Animator>();
+        adapter = GetComponent<PlayerInputAdapter>();
+        isGrounded = true;
     }
     
     void Update()
     {
-        IsGrounded();
+        CalcIsGrounded();
+        
+        isFalling = rigidbody.linearVelocity.y < -0.01f;
+        
     }
 
-    bool IsGrounded()
+    void LateUpdate()
+    {
+        animator.SetBool(isFallingHash, IsFalling);                
+        animator.SetBool(isGroundedHash, IsGrounded);
+        animator.SetFloat(movementHash, adapter.InputAxis.magnitude);
+    }
+
+    bool CalcIsGrounded()
     {
         isGrounded = Physics.CheckSphere(
             transform.position + (Vector3.down * checkDistance), 
@@ -76,7 +98,13 @@ public class PlayerMotor : MonoBehaviour
     {
         transform.rotation = rotation;
     }
-    
+
+    public void Jump()
+    {
+        Vector3 jumpForce = Vector3.up * jumpPower;
+        
+        rigidbody.AddForce(jumpForce, ForceMode.Impulse);
+    }
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;

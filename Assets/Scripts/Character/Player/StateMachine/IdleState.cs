@@ -37,11 +37,16 @@ namespace Character.Player.StateMachine
             {
                 return;
             }
-            
             if (inputContext.action.name.Equals("Attack"))
             {
                 context.fsm.ChangeState(typeof(AttackState));
             }
+            
+            if (inputContext.action.name.Equals("Jump"))
+            {
+                context.fsm.ChangeState(typeof(JumpState));
+            }
+            
         }
     }
 }

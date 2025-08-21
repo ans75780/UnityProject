@@ -66,7 +66,7 @@ public class Player : MonoBehaviour
         fsm.CreateState(typeof(HitState), new HitState());
         fsm.CreateState(typeof(DeadState), new DeadState());
         fsm.CreateState(typeof(DodgeState), new DodgeState());
-        
+        fsm.CreateState(typeof(JumpState), new JumpState());
         
         currentStateName = fsm.GetCurrentStateName();
     }

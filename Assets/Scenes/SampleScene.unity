@@ -192,7 +192,7 @@ Transform:
   m_GameObject: {fileID: 104609909}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.357, y: 1.118, z: 3.25}
+  m_LocalPosition: {x: 2.357, y: 1.135, z: 3.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -485,7 +485,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.357, y: 1.118, z: 3.25}
+  m_LocalPosition: {x: 2.357, y: 1.135, z: 3.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2093,7 +2093,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8024061821027778858, guid: 58463068464b21246a8d74a9d8b66630, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.017
       objectReference: {fileID: 0}
     - target: {fileID: 8024061821027778858, guid: 58463068464b21246a8d74a9d8b66630, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2130,6 +2130,10 @@ PrefabInstance:
     - target: {fileID: 8024061821027949834, guid: 58463068464b21246a8d74a9d8b66630, type: 3}
       propertyPath: m_Name
       value: unitychan
+      objectReference: {fileID: 0}
+    - target: {fileID: 8187912533475168186, guid: 58463068464b21246a8d74a9d8b66630, type: 3}
+      propertyPath: jumpPower
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8187912533475168186, guid: 58463068464b21246a8d74a9d8b66630, type: 3}
       propertyPath: playerCamera

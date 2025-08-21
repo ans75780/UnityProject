@@ -27,6 +27,7 @@ namespace Character.Player
 
         private InputAction dodgeAction;
         
+        private InputAction jumpAction;
         
         public delegate void InputContextHandler(InputAction.CallbackContext context);
         
@@ -72,6 +73,8 @@ namespace Character.Player
             dodgeAction = playerInput.actions.FindAction("Dodge");
             dodgeAction.started += ReceiveOnDodge;
             
+            jumpAction = playerInput.actions.FindAction("Jump");
+            jumpAction.started += ReceiveInput;
         }
 
         void OnDisable()
@@ -84,6 +87,7 @@ namespace Character.Player
             
             dodgeAction.started -= ReceiveOnDodge;
             
+            jumpAction.started -= ReceiveInput;
         }
 
         void ReceiveOnMove(InputAction.CallbackContext context)
@@ -98,7 +102,7 @@ namespace Character.Player
                 OnInputContext.Invoke(context);
             }
         }
-
+        
         void ReceiveOnDodge(InputAction.CallbackContext context)
         {
             Debug.Log("DodgeTest");

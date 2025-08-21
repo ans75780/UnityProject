@@ -5,8 +5,6 @@ namespace Character.Player.StateMachine
 {
     public class MoveState : IPlayerState
     {
-        private int movementHash = Animator.StringToHash("Movement");
-        
         public override void Enter(PlayerContext context)
         {
             Debug.Log("Enter MoveState");
@@ -43,7 +41,7 @@ namespace Character.Player.StateMachine
 
         public override void LateUpdate(PlayerContext context, float fixedDeltaTime)
         {
-            context.animator.SetFloat(movementHash, context.adapter.InputAxis.sqrMagnitude);
+           
         }
 
         public override void Exit(PlayerContext context)
@@ -57,6 +55,11 @@ namespace Character.Player.StateMachine
             {
                 context.fsm.ChangeState(typeof(AttackState));
             }
+            if (inputContext.action.name.Equals("Jump"))
+            {
+                context.fsm.ChangeState(typeof(JumpState));
+            }
+            
         }
     }
 }
