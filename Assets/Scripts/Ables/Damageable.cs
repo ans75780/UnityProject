@@ -19,6 +19,9 @@ namespace Ables
     {
         [SerializeField] float maxHealth;
 
+        private float maxHpRatio = 1f;
+        private float minHpRatio = 0f;
+        
         public float MaxHealth
         {
             get { return maxHealth; }
@@ -48,7 +51,11 @@ namespace Ables
         public delegate void DeathHandler(DamageInfo damageInfo);
 
         public event DeathHandler OnDeath;
-
+        
+        public delegate void ChangedHpRatioHandler(float ratio);
+        
+        public event  ChangedHpRatioHandler OnChangedHpRatio;
+        
         public void ApplyDamage(DamageInfo damageInfo)
         {
             if (currentHealth == 0f)
@@ -62,18 +69,28 @@ namespace Ables
             if (currentHealth == 0f)
             {
                 OnDeath(damageInfo);
+                OnChangedHpRatio(minHpRatio);
+
             }
             else
             {
                 OnApplyDamage(damageInfo);
+                OnChangedHpRatio(GetRatio());
             }
         }
 
         public void Heal(float amount)
         {
             currentHealth = Mathf.Clamp(currentHealth - amount, 0, maxHealth);
+            OnChangedHpRatio(GetRatio());
         }
 
+        public void Reset()
+        {
+            currentHealth = maxHealth;
+            OnChangedHpRatio(maxHpRatio);
+        }
+        
         public bool IsDead()
         {
             return currentHealth == 0f;
@@ -83,5 +100,11 @@ namespace Ables
         {
             currentHealth = MaxHealth;
         }
+
+        public float GetRatio()
+        {
+            return currentHealth / maxHealth;
+        }
+        
     }
 }

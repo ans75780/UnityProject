@@ -7,6 +7,11 @@ namespace Character.Player.StateMachine
     {
         private int isHit = Animator.StringToHash("OnHit");
         
+        public HitState()
+        {
+            autoTransition = true;
+        }
+        
         public override void Enter(PlayerContext context)
         {
             context.animator.SetTrigger(isHit);
@@ -14,7 +19,7 @@ namespace Character.Player.StateMachine
 
         public override void Update(PlayerContext context, float deltaTime)
         {
-           
+          
         }
         
         public override void FixedUpdate(PlayerContext context, float fixedDeltaTime)

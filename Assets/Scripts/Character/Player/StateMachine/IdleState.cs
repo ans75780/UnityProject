@@ -5,7 +5,8 @@ namespace Character.Player.StateMachine
 {
     public class IdleState : IPlayerState
     {
-   
+        int idleStateHash = Animator.StringToHash("Idle");
+
         public override void Enter(PlayerContext context)
         {
             Debug.Log("Enter IdleState");

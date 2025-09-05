@@ -9,7 +9,7 @@ namespace Character.Player.StateMachine
         
         public override void Enter(PlayerContext context)
         {
-            
+            context.animator.SetTrigger(onDeathHash);
         }
         
         public override void Update(PlayerContext context, float deltaTime)

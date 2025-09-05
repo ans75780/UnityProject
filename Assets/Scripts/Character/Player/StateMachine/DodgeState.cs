@@ -10,6 +10,12 @@ namespace Character.Player.StateMachine
     public class DodgeState :IPlayerState
     {
         private int onDodgeHash = Animator.StringToHash("OnDodge");
+
+
+        public DodgeState()
+        {
+            autoTransition = true;
+        }
         
         public override void Enter(PlayerContext context)
         {
@@ -44,11 +50,17 @@ namespace Character.Player.StateMachine
 
         public override void Update(PlayerContext context, float deltaTime)
         {
-        
+            
         }
     
         public override void FixedUpdate(PlayerContext context, float fixedDeltaTime)
         {
+            //스테이트가 끝날 경우
+            //if (context.animator.GetCurrentAnimatorStateInfo(0).IsTag("Dodge") && 
+            //    context.animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.95f)
+            //{
+            //    context.fsm.ChangeState(typeof(IdleState));
+            //}
         }
 
         public override void LateUpdate(PlayerContext context, float deltaTime)

@@ -9,141 +9,162 @@ using UnityEngine.InputSystem;
 using PlayerCombat = Character.Player.PlayerCombat;
 
 
-public class Player : MonoBehaviour
+namespace Character.Player
 {
-    private int movementHash = Animator.StringToHash("Movement");
-    private int isRollHash = Animator.StringToHash("IsRoll");
-    private int hitAngleHash = Animator.StringToHash("HitAngle");
-    
-    Damageable damageable;
-    
-    private PlayerMotor playerMotor;
-    
-    private PlayerCombat playerCombat;
-    
-    private PlayerStateMachine fsm;
+    public class Player : MonoBehaviour
+    {
+        private int movementHash = Animator.StringToHash("Movement");
+        private int isRollHash = Animator.StringToHash("IsRoll");
+        private int hitAngleHash = Animator.StringToHash("HitAngle");
 
-    
-    
-    public PlayerStateMachine FSM
-    {
-        get { return fsm; }
-    }
-    public GameObject weapon;
-    
-    Animator animator;
-    
-    private int playerLevel;
+        Damageable damageable;
 
-    private Rigidbody rb;
-    private bool isDead = false;
-    
-    
-    [SerializeField]
-    private string currentStateName;
-    
-    void Awake()
-    {
-        animator = GetComponent<Animator>();
-        playerMotor =  GetComponent<PlayerMotor>();
-        playerCombat = GetComponent<PlayerCombat>();
-        
-        
-        PlayerContext context =  new PlayerContext();
-        context.animator = animator;
-        context.rigidbody = GetComponent<Rigidbody>();
-        context.player = this;
-        context.adapter = GetComponent<PlayerInputAdapter>();
-        context.motor = playerMotor;
-        context.combat = playerCombat;
-        
-        rb = GetComponent<Rigidbody>();
-        damageable =  GetComponent<Damageable>();
-        
-        fsm = new PlayerStateMachine(context, new IdleState());
-        fsm.CreateState(typeof(MoveState), new MoveState());
-        fsm.CreateState(typeof(AttackState), new AttackState());
-        fsm.CreateState(typeof(HitState), new HitState());
-        fsm.CreateState(typeof(DeadState), new DeadState());
-        fsm.CreateState(typeof(DodgeState), new DodgeState());
-        fsm.CreateState(typeof(JumpState), new JumpState());
-        
-        currentStateName = fsm.GetCurrentStateName();
-    }
-    
-    void OnEnable()
-    {
-        isDead = false;
+        private PlayerMotor playerMotor;
 
-        damageable.OnApplyDamage += ReceiveOnApplyDamage;
-        damageable.OnDeath += ReceiveOnDeath;
-        fsm.OnChangeState += ReceiveOnChangeState;
-    }
-    
-    void OnDisable()
-    {
-        isDead = true;
-        damageable.OnApplyDamage -= ReceiveOnApplyDamage;
-        damageable.OnDeath -= ReceiveOnDeath;
-        fsm.OnChangeState -= ReceiveOnChangeState;
-    }
-    
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        playerLevel = 1;
+        private PlayerCombat playerCombat;
 
-        if (weapon)
+        private PlayerStateMachine fsm;
+
+
+
+        public PlayerStateMachine FSM
         {
-            GameObject weaponObject = Instantiate(weapon);
-            playerCombat.Equip(weaponObject);
+            get { return fsm; }
         }
-    }
-    
-    // Update is called once per frame
-    void Update()
-    {
-        if (!isDead)
-            fsm.Update(Time.deltaTime);
-    }
 
-    void FixedUpdate()
-    {
-        if (!isDead)
-            fsm.FixedUpdate(Time.fixedDeltaTime);
-    }
+        public GameObject weapon;
 
-    void LateUpdate()
-    {
-        if (!isDead)
-            fsm.LateUpdate(Time.deltaTime);
-    }
-    
-    void ReceiveOnChangeState(IPlayerState newState)
-    {
-        currentStateName = fsm.GetCurrentStateName();
-    }
-    
-    void ReceiveOnApplyDamage(DamageInfo damageInfo)
-    {
-        if (isDead)
-            return;
-        
-        Vector3 forward = transform.forward;
-        Vector3 direction = damageInfo.damageDirection.normalized;
-        
-        rb.AddForce(direction * 1.5f,  ForceMode.Impulse);
-        
-        float dot =  Vector3.Dot(forward, direction);
-        //Debug.Log("Hit : " + dot);
-        
-        animator.SetFloat(hitAngleHash, dot);
-        fsm.ChangeState(typeof(HitState));
-    }
+        Animator animator;
 
-    void ReceiveOnDeath(DamageInfo damageInfo)
-    {
-        isDead = true;
-        fsm.ChangeState(typeof(DeadState));
+        private int playerLevel;
+
+        private Rigidbody rb;
+        private bool isDead = false;
+
+        private PlayerInputAdapter playerInputAdapter;
+
+
+        [SerializeField] private string currentStateName;
+
+        public delegate void playerDeathHandle();
+
+        public event playerDeathHandle OnPlayerDeath;
+
+
+        void Awake()
+        {
+            animator = GetComponent<Animator>();
+            playerMotor = GetComponent<PlayerMotor>();
+            playerCombat = GetComponent<PlayerCombat>();
+            playerInputAdapter = GetComponent<PlayerInputAdapter>();
+
+            PlayerContext context = new PlayerContext();
+            context.animator = animator;
+            context.rigidbody = GetComponent<Rigidbody>();
+            context.player = this;
+            context.adapter = playerInputAdapter;
+            context.motor = playerMotor;
+            context.combat = playerCombat;
+
+            rb = GetComponent<Rigidbody>();
+            damageable = GetComponent<Damageable>();
+
+            fsm = new PlayerStateMachine(context, new IdleState());
+            fsm.CreateState(typeof(MoveState), new MoveState());
+            fsm.CreateState(typeof(AttackState), new AttackState());
+            fsm.CreateState(typeof(HitState), new HitState());
+            fsm.CreateState(typeof(DeadState), new DeadState());
+            fsm.CreateState(typeof(DodgeState), new DodgeState());
+            fsm.CreateState(typeof(JumpState), new JumpState());
+
+            currentStateName = fsm.GetCurrentStateName();
+        }
+
+        void OnEnable()
+        {
+            isDead = false;
+
+            damageable.OnApplyDamage += ReceiveOnApplyDamage;
+            damageable.OnDeath += ReceiveOnDeath;
+            fsm.OnChangeState += ReceiveOnChangeState;
+
+            playerInputAdapter.enabled = true;
+
+
+            damageable.Reset();
+            
+            fsm.ChangeState(typeof(IdleState));
+        }
+
+        void OnDisable()
+        {
+            isDead = true;
+            damageable.OnApplyDamage -= ReceiveOnApplyDamage;
+            damageable.OnDeath -= ReceiveOnDeath;
+            fsm.OnChangeState -= ReceiveOnChangeState;
+        }
+
+        // Start is called once before the first execution of Update after the MonoBehaviour is created
+        void Start()
+        {
+            playerLevel = 1;
+
+            if (weapon)
+            {
+                GameObject weaponObject = Instantiate(weapon);
+                playerCombat.Equip(weaponObject);
+            }
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            if (!isDead)
+                fsm.Update(Time.deltaTime);
+        }
+
+        void FixedUpdate()
+        {
+            if (!isDead)
+                fsm.FixedUpdate(Time.fixedDeltaTime);
+        }
+
+        void LateUpdate()
+        {
+            if (!isDead)
+                fsm.LateUpdate(Time.deltaTime);
+        }
+
+        void ReceiveOnChangeState(IPlayerState newState)
+        {
+            currentStateName = fsm.GetCurrentStateName();
+        }
+
+        void ReceiveOnApplyDamage(DamageInfo damageInfo)
+        {
+            if (isDead)
+                return;
+
+            Vector3 forward = transform.forward;
+            Vector3 direction = damageInfo.damageDirection.normalized;
+
+            rb.AddForce(direction * 1.5f, ForceMode.Impulse);
+
+            float dot = Vector3.Dot(forward, direction);
+            //Debug.Log("Hit : " + dot);
+
+            animator.SetFloat(hitAngleHash, dot);
+            fsm.ChangeState(typeof(HitState));
+        }
+
+        void ReceiveOnDeath(DamageInfo damageInfo)
+        {
+            isDead = true;
+            playerInputAdapter.enabled = false;
+            fsm.ChangeState(typeof(DeadState));
+
+            if (OnPlayerDeath != null)
+                OnPlayerDeath();
+        }
     }
 }

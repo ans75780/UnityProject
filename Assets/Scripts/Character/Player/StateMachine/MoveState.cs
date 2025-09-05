@@ -46,7 +46,7 @@ namespace Character.Player.StateMachine
 
         public override void Exit(PlayerContext context)
         {
-            context.animator.SetFloat(movementHash, 0);
+            
         }
 
         public override void InputedContext(PlayerContext context, InputAction.CallbackContext inputContext)

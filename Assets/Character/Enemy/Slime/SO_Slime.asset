@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SO_Slime
   m_EditorClassIdentifier: 
   name: Slime
-  maxHp: 10
+  maxHp: 30
   atk: 3
   attackRange: 1
   moveSpeed: 1

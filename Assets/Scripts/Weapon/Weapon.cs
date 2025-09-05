@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Xml.Schema;
 using Ables;
 using UnityEngine;
@@ -8,10 +9,14 @@ public class Weapon : MonoBehaviour
     CapsuleCollider capsuleCollider;
     
     GameObject owner;
-
+    
+    private static int maxCollisionTargetSize = 16;
+    
     public event Func<float, float> OnWeaponDamageCalc;
 
     public float weaponDamage = 5;
+
+    private HashSet<int> collisionSet = new HashSet<int>(maxCollisionTargetSize);
     
     public void SetOwner(GameObject _owner)
     {
@@ -35,6 +40,7 @@ public class Weapon : MonoBehaviour
         capsuleCollider = GetComponent<CapsuleCollider>();
         capsuleCollider.enabled = false;
         
+      
     }
     
     public void OnAttackStart()
@@ -46,6 +52,8 @@ public class Weapon : MonoBehaviour
     public void OnAttackEnd()
     {
         capsuleCollider.enabled = false;
+        collisionSet.Clear();
+        
     }
     
     void OnTriggerEnter(Collider other)
@@ -54,7 +62,10 @@ public class Weapon : MonoBehaviour
         
         Damageable damageable = other.gameObject.GetComponent<Damageable>();
         if (damageable == null || damageable.IsInvincible == true) return;
-        
+
+        if (!collisionSet.Add(other.gameObject.GetInstanceID()))
+            return;
+            
         DamageInfo damageInfo = new DamageInfo();
         float totalDamage = 0;
 

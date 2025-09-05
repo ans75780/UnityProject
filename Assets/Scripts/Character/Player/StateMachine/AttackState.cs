@@ -8,9 +8,13 @@ namespace Character.Player.StateMachine
     {
         private int isAttackHash = Animator.StringToHash("IsAttack");
         private int comboCountHash = Animator.StringToHash("ComboCount");
-
         
         public int comboCount = 0;
+        
+        public AttackState()
+        {
+            autoTransition = true;
+        }
         
         public override void Enter(PlayerContext context)
         {
@@ -27,7 +31,13 @@ namespace Character.Player.StateMachine
 
         public override void FixedUpdate(PlayerContext context, float fixedDeltaTime)
         {
-            
+            //스테이트가 끝날 경우
+            //if (context.animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack") && 
+            //    context.combat.EnableNextAttack == false &&
+            //    context.animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.95f)
+            //{
+            //    context.fsm.ChangeState(typeof(IdleState));
+            //}
         }
 
         public override void LateUpdate(PlayerContext context, float deltaTime)

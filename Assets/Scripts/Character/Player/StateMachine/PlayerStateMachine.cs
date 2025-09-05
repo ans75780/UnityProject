@@ -44,8 +44,13 @@ public abstract class IPlayerState
     {
         
     }
-    
-    
+
+    protected bool autoTransition = false;
+    public bool AutoTransition
+    {
+        get { return autoTransition; }
+    }
+
 }
 
 public class PlayerStateMachine
@@ -121,6 +126,10 @@ public class PlayerStateMachine
     {
         if (changeState == currentState) return;
         if (changeState.CheckCondition(context) == false) return;
+        if (context.animator.IsInTransition(0))
+        {
+            return;
+        }
         
         currentState.Exit(context);
 
@@ -139,6 +148,14 @@ public class PlayerStateMachine
     public void FixedUpdate(float deltaTime)
     {
         currentState.FixedUpdate(context, deltaTime);
+
+        if (context.animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.95f &&
+            currentState.CheckCondition(context) == true &&
+            currentState.AutoTransition)
+        {
+            Debug.Log("AutoTransition");
+            ChangeState(typeof(IdleState));
+        }
     }
     public void LateUpdate(float deltaTime)
     {
