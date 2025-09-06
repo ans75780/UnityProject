@@ -4,14 +4,6 @@ using UnityEngine;
 public class SO_EnemyData : ScriptableObject
 {
     [SerializeField] 
-    private string name;
-
-    public string Name
-    {
-        get { return name; }
-    }
-
-    [SerializeField] 
     private float maxHp;
 
     public float MaxHp

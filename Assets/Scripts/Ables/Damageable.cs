@@ -5,13 +5,21 @@ using UnityEngine.Rendering;
 
 namespace Ables
 {
+    public enum DamageType
+    {
+        Default, //기본 공격 타입, 피격 애니메이션을 출력한다.
+        Knockback, //멀리 날아가야하는 경우에 붙여준다.
+        Tick, //독뎀, 화상뎀같은 틱마다 발생하 효과, 피격 애니메이션을 출력하지 않는다.
+    }
+    
+    
 
     public struct DamageInfo
     {
         public float amount;
         public GameObject damageSource;
         public Vector3 damageDirection;
-        public object damageType;
+        public DamageType damageType;
     }
 
 
@@ -74,7 +82,10 @@ namespace Ables
             }
             else
             {
-                OnApplyDamage(damageInfo);
+                if (damageInfo.damageType != DamageType.Tick)
+                {
+                    OnApplyDamage(damageInfo);
+                }
                 OnChangedHpRatio(GetRatio());
             }
         }
@@ -88,7 +99,7 @@ namespace Ables
         public void Reset()
         {
             currentHealth = maxHealth;
-            OnChangedHpRatio(maxHpRatio);
+            OnChangedHpRatio?.Invoke(maxHpRatio);
         }
         
         public bool IsDead()

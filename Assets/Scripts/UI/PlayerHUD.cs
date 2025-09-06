@@ -1,3 +1,4 @@
+using System.Collections;
 using Ables;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +11,13 @@ namespace UI
         private Slider hpBar;
         private Slider staminaBar;
         private Player player;
+
+
+        private float targetRatio;
+        private Coroutine corLerpHpBar;
+
+        [Range(1, 5)] 
+        public float lerpSpeed = 1f;
         
         void Awake()
         {
@@ -37,8 +45,26 @@ namespace UI
 
         void Receive_OnChangedHpRatio(float hpRatio)
         {
-            hpBar.value = hpRatio;
+            if (corLerpHpBar != null)
+            {
+                StopCoroutine(corLerpHpBar);
+                corLerpHpBar = null;
+            }
+            corLerpHpBar = StartCoroutine(CorLerpHpBar(hpRatio));
         }
-        
+
+        IEnumerator CorLerpHpBar(float targetRatio)
+        {
+            while (Mathf.Abs(hpBar.value - targetRatio) > 0.001f)
+            {
+                hpBar.value = Mathf.Lerp(hpBar.value, targetRatio, lerpSpeed * Time.deltaTime);
+                yield return null;
+            }
+            hpBar.value = targetRatio;
+
+            // 마지막에 정확히 맞춰주기
+            hpBar.value = targetRatio;
+            corLerpHpBar = null;
+        }
     }
 }

@@ -1,7 +1,8 @@
 using System;
 using Ables;
+using Character.Ability;
 using Character.Player;
-using Character.Player.StateMachine;
+using Character.Player.FSM;
 using NUnit.Framework.Constraints;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -25,8 +26,7 @@ namespace Character.Player
 
         private PlayerStateMachine fsm;
 
-
-
+        
         public PlayerStateMachine FSM
         {
             get { return fsm; }
@@ -43,7 +43,8 @@ namespace Character.Player
 
         private PlayerInputAdapter playerInputAdapter;
 
-
+        private AbilitySystem abilitySystem;
+        
         [SerializeField] private string currentStateName;
 
         public delegate void playerDeathHandle();
@@ -78,6 +79,9 @@ namespace Character.Player
             fsm.CreateState(typeof(JumpState), new JumpState());
 
             currentStateName = fsm.GetCurrentStateName();
+            
+            abilitySystem = GetComponent<AbilitySystem>();
+            
         }
 
         void OnEnable()
@@ -90,10 +94,11 @@ namespace Character.Player
 
             playerInputAdapter.enabled = true;
 
-
             damageable.Reset();
             
             fsm.ChangeState(typeof(IdleState));
+            fsm.OnPossess();
+            
         }
 
         void OnDisable()
@@ -102,6 +107,8 @@ namespace Character.Player
             damageable.OnApplyDamage -= ReceiveOnApplyDamage;
             damageable.OnDeath -= ReceiveOnDeath;
             fsm.OnChangeState -= ReceiveOnChangeState;
+            
+            fsm.OnDisPossess();
         }
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -135,7 +142,7 @@ namespace Character.Player
                 fsm.LateUpdate(Time.deltaTime);
         }
 
-        void ReceiveOnChangeState(IPlayerState newState)
+        void ReceiveOnChangeState(PlayerState newState)
         {
             currentStateName = fsm.GetCurrentStateName();
         }

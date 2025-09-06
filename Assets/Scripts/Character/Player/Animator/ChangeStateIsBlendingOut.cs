@@ -1,6 +1,6 @@
 using System;
 using Character.Player;
-using Character.Player.StateMachine;
+using Character.Player.FSM;
 using UnityEngine;
 
 public class ChangeStateIsBlendingOut : StateMachineBehaviour

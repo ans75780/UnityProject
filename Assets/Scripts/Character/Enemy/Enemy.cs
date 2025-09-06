@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Ables;
-using Character.Enemy.StateMachine;
+using Character.Enemy.FSM;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -26,7 +26,12 @@ public class Enemy : MonoBehaviour
     private Rigidbody rb;
     
     private EnemyStateMachine fsm;
- 
+
+    public EnemyStateMachine FSM
+    {
+        get { return fsm; }
+        private set { }
+    }
     
     private Damageable damageable;
     
@@ -34,18 +39,9 @@ public class Enemy : MonoBehaviour
 
     private Weapon weapon;
     
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         sense = GetComponent<Sense>();
-
-        weapon = GetComponentInChildren<Weapon>();
-
-        if (weapon != null)
-        {
-            weapon.SetOwner(this.gameObject);
-        }
-        
         
         sense.AddModality(GetComponent<VisionSensor>());
         
@@ -57,7 +53,7 @@ public class Enemy : MonoBehaviour
         
         rb = GetComponent<Rigidbody>();
         
-       EnemyContext context = new EnemyContext();
+        EnemyContext context = new EnemyContext();
         
         context.enemy = this;
         context.animator = animator;
@@ -67,29 +63,30 @@ public class Enemy : MonoBehaviour
         context.navMeshAgent = navMeshAgent;
         
         fsm = new EnemyStateMachine(context, new IdleState());
-        
         fsm.CreateState(typeof(PatrolState), new PatrolState());
-        
         fsm.CreateState(typeof(ChaseState), new ChaseState());
-        
         fsm.CreateState(typeof(AlertState), new AlertState());
-        
         fsm.CreateState(typeof(AttackState), new AttackState());
-        
         fsm.CreateState(typeof(HitState), new HitState());
-
         fsm.CreateState(typeof(DeadState), new DeadState());
         
         SetupPatrolPoints();
 
         damageable = GetComponent<Damageable>();
-
         damageable.MaxHealth = enemyData.MaxHp;
-        
         navMeshAgent.speed = enemyData.MoveSpeed;
         
-        SubscriptionEvents();
-        
+        SubscriptionEvents();   
+    }
+
+    void Start()
+    {
+        weapon = GetComponentInChildren<Weapon>();
+
+        if (weapon != null)
+        {
+            weapon.SetOwner(this.gameObject);
+        }
     }
 
     // Update is called once per frame
@@ -171,12 +168,12 @@ public class Enemy : MonoBehaviour
 
     void OnEnable()
     {
-       
+       fsm.OnPossess();
     }
 
     void OnDisable()
     {
-        
+        fsm.OnDisPossess();
     }
 
     void SubscriptionEvents()
@@ -220,11 +217,6 @@ public class Enemy : MonoBehaviour
         }
     }
     
-    void Notify_ChangeState(string newStateName)
-    {
-        fsm.ChangeState(Type.GetType("Character.Enemy.StateMachine." + newStateName));
-    }
-    
     void Notify_AttackStart()
     {
         weapon.OnAttackStart();
@@ -235,7 +227,7 @@ public class Enemy : MonoBehaviour
         weapon.OnAttackEnd();
     }
     
-    void ReceiveOnChangeState(IEnemyState newState)
+    void ReceiveOnChangeState(EnemyState newState)
     {
         currentStateName = fsm.GetCurrentStateName();
     }
